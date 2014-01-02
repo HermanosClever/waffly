@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Waffly demo</title>
+</head>
+<body>
+
+	<div class="grafica color1" data-waffly-title="FIBA 320" data-waffly-value="90,5698989%">Tooltip</div>
+
+	<script src="jquery.min.js"></script>
+	<script src="jquery.waffly.js"></script>
+
+	<script>
+	$(document).ready(function() {
+		$('.grafica').waffly({
+			graph_width: 200,
+			dot_gap: 6,
+			default_color:'#fc0',
+			graph_color:'#f90',
+		});
+	});
+	</script>
+</body>
+</html>
