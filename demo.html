@@ -6,21 +6,27 @@
 </head>
 <body>
 
-	<div class="grafica color1" data-waffly-title="Waffly (Jquery plugin)" data-waffly-value="57,142857143%">Tooltip</div>
+	<div class="chart" data-waffly-title="Waffly (Jquery plugin)" data-waffly-value="99.7%">
+		<div class="title">Waffly (Jquery plugin)</div>
+		<meter class="chart" value="57.142857143" optimun="70" max="100"></meter>
+	</div>
+
 
 	<script src="jquery.min.js"></script>
 	<script src="jquery.waffly.js"></script>
 
 	<script>
 	$(document).ready(function() {
-		$('.grafica').waffly({
-			graph_width: 250,
+		$('.chart').waffly({
+			graph_width: 260,
 			dot_gap: 3,
 			dot_radius:'3px',
-			graph_color:'#07c',
-			graph_title_color:'#07c',
-			graph_value_color:'#888',
-			dot_opacity:.4,
+			graph_color:'#f90',
+			graph_title_color:'#555',
+			graph_value_color:'#f90',
+			dot_opacity:.2,
+			graph_reverse:true,
+			graph_animate:true
 		});
 	});
 	</script>

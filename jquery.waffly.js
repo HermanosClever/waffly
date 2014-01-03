@@ -3,24 +3,25 @@
 	$.fn.waffly = function( options ){
 
 		// let's establish our default options
-		var obj, rvalue, gvalue, def_bg, opacity_style, dot_styles, dot_width, settings = $.extend({
+		var $dots, $dot, obj, rvalue, gvalue, def_bg, opacity_style, dot_styles, dot_width, settings = $.extend({
 			class_name: 'waffly',
 			style_override: false,
 			default_color: '',
 			graph_font: 'arial, sans-serif',
-			graph_title_color: '#05c',
+			graph_title_color: '#666',
 			graph_value_color: '#05c',
 			graph_color: '#05c',
 			graph_value:'80%',
 			graph_margin: '30px',
 			graph_class:'sel',
 			total_dots: 100,
-			graph_width: 900,
+			graph_width: 250,
 			dot_row:10,
-			dot_gap:2,
-			dot_radius:'0%',
+			dot_gap:3,
+			dot_radius:'20%',
 			dot_opacity:'.5',
-			graph_reverse: false
+			graph_reverse: false,
+			graph_animate: true
 		}, options);
 
 
@@ -78,7 +79,12 @@
 				for (var i = 0; i < settings.total_dots; i++) {
 
 					if ( i < parseInt(settings.graph_value) ) {
-						obj += '<li class="waffly_dot d' + (i+1) + ' ' + settings.graph_class + '" style="background:' + settings.graph_color + ';' + dot_styles + '"></li>';
+						if (settings.graph_animate){
+							obj += '<li class="waffly_dot d' + (i+1) + ' ' + settings.graph_class + '" style="background:' + def_bg + ';' + dot_styles + opacity_styles + '"></li>';
+						} else {
+							obj += '<li class="waffly_dot d' + (i+1) + ' ' + settings.graph_class + '" style="background:' + settings.graph_color + ';' + dot_styles + '"></li>';
+						}
+
 					} else {
 						obj += '<li class="waffly_dot d' + (i+1) +'" style="background:' + def_bg + ';' + dot_styles + opacity_styles + '"></li>';
 					}
@@ -94,6 +100,44 @@
 				obj += '</div>';
 
 				$(this).html( obj );
+
+				if (settings.graph_reverse){
+					$(this).find('.waffly_dots').append( $(this).find('.waffly_dot').get().reverse() );
+				}
+
+				// animacion
+
+				$dots = $(this).find('.waffly_dot.sel');
+
+				if (settings.graph_animate){
+
+					if (settings.graph_reverse){
+
+// resta 61 y coges el puto valor absoluto! Gañán!
+
+
+						$(this).find('.waffly_dot.sel').each(function(index,el) {
+							var $dot = $dots.eq( Math.abs(index - $dots.length + 1 ) );
+
+							setTimeout(function(){
+								$dot.animate({'opacity': 1}, 10);
+							},500 + (index*20));
+
+						});
+
+					} else {
+
+						$(this).find('.waffly_dot.sel').each(function(index,el) {
+
+							setTimeout(function(){
+								$(el).animate({'opacity': 1}, 10);
+							},500 + (index*20));
+
+						});
+
+					}
+
+				}
 
 		});
 
