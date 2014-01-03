@@ -3,44 +3,50 @@
 	$.fn.waffly = function( options ){
 
 		// let's establish our default options
-		var obj, gvalue, dot_styles, dot_width, settings = $.extend({
+		var obj, rvalue, gvalue, def_bg, opacity_style, dot_styles, dot_width, settings = $.extend({
 			class_name: 'waffly',
 			style_override: false,
-			default_color: '#ddd',
+			default_color: '',
 			graph_font: 'arial, sans-serif',
 			graph_title_color: '#05c',
+			graph_value_color: '#05c',
 			graph_color: '#05c',
 			graph_value:'80%',
+			graph_margin: '30px',
 			graph_class:'sel',
 			total_dots: 100,
 			graph_width: 900,
 			dot_row:10,
-			dot_gap:4,
-			dot_radius:'0%'
+			dot_gap:2,
+			dot_radius:'0%',
+			dot_opacity:'.5',
+			graph_reverse: false
 		}, options);
 
 
 		this.each(function() {
 
 				if ( $(this).data('waffly-value') ){
-
 					settings.graph_value = $(this).data('waffly-value').replace(',','.');
+				} else {
+					settings.graph_value = settings.graph_value.replace(',','.');
+				}
 
+				if ( settings.graph_value.indexOf('.') > -1 ){
 					gvalue = settings.graph_value.split('.');
-					console.log(gvalue);
-					if ( gvalue[1].length > 2 ){
-						settings.graph_value = settings.graph_value;
+
+					if ( gvalue[1].length > 3 ){
+						settings.graph_value = parseFloat(settings.graph_value).toFixed(2) + '%';
 					}
-
 				}
 
-				obj = '<div class="' + settings.class_name + '" style="font-family:' + settings.graph_font + ';width:' + settings.graph_width + 'px;" title="' + $(this).text() + '">';
+				obj = '<div class="' + settings.class_name + '" style="-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;font-family:' + settings.graph_font + ';padding:' + settings.graph_margin + ';width:' + settings.graph_width + 'px;" title="' + $(this).text() + '">';
 
-				if ( $(this).data('waffly-value') ){
-					obj += '<div class="waffly_value" style="font-size:2.65em;font-weight:bold;margin:1em 0 .5em;text-align:center">' + $(this).data('waffly-value') + '</div>';
-				}
 
-				dot_width = Math.floor( ( settings.graph_width - ( (settings.dot_row-1) * settings.dot_gap) ) / settings.dot_row );
+				obj += '<div class="waffly_value" style="color:' + settings.graph_value_color + ';font-size:2.5em;font-weight:bold;margin:.5em 0 .25em;text-align:center">' + settings.graph_value + '</div>';
+
+
+				dot_width = Math.floor( ( (settings.graph_width - ( ( parseInt(settings.graph_margin) )*2 )  ) - ( (settings.dot_row-1) * settings.dot_gap) ) / settings.dot_row );
 
 				obj += '<ul class="waffly_dots" style="font-size:0;list-style:none;margin:0;padding:0;">';
 
@@ -51,12 +57,30 @@
 				dot_styles += 'margin:0 ' + settings.dot_gap + 'px ' + settings.dot_gap + 'px 0;';
 				dot_styles += 'width:' + dot_width + 'px;';
 
+				opacity_styles ='';
+				if ( settings.default_color === '' ){
+
+					def_bg = settings.graph_color;
+
+					opacity_styles += "-ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=" + ( settings.dot_opacity * 100 ) + ")';";
+					opacity_styles += 'filter: alpha(opacity=' + ( settings.dot_opacity * 100 ) + ');';
+					opacity_styles += '-moz-opacity: ' + settings.dot_opacity + ';';
+					opacity_styles += '-khtml-opacity: ' + settings.dot_opacity + ';';
+					opacity_styles += 'opacity:' + settings.dot_opacity + ';';
+
+				} else{
+
+					def_bg = settings.default_color;
+
+				}
+
+
 				for (var i = 0; i < settings.total_dots; i++) {
 
-					if ( i < parseFloat(settings.graph_value) ) {
+					if ( i < parseInt(settings.graph_value) ) {
 						obj += '<li class="waffly_dot d' + (i+1) + ' ' + settings.graph_class + '" style="background:' + settings.graph_color + ';' + dot_styles + '"></li>';
 					} else {
-						obj += '<li class="waffly_dot d' + (i+1) +'" style="background:' + settings.default_color + ';' + dot_styles + '"></li>';
+						obj += '<li class="waffly_dot d' + (i+1) +'" style="background:' + def_bg + ';' + dot_styles + opacity_styles + '"></li>';
 					}
 
 				};
@@ -64,24 +88,13 @@
 				obj += '</ul>';
 
 				if ( $(this).data('waffly-title') ){
-					obj += '<div class="waffly_title" style="margin-top:.5em;text-align:center">' + $(this).data('waffly-title') + '</div>';
+					obj += '<div class="waffly_title" style="color:' + settings.graph_title_color + ';margin-top:.75em;text-align:center">' + $(this).data('waffly-title') + '</div>';
 				}
 
 				obj += '</div>';
+
 				$(this).html( obj );
 
-				/*
-				$(this).prepend('<div class="' + settings.className + '"></div>');
-				$('.' + settings.className).text($(window).width() + ' px');
-
-				if ( settings.style ) {
-					$('.' + settings.className).css( settings.style );
-				}
-
-				$(window).resize(function() {
-					$('.' + settings.className).text($(window).width() + ' px');
-				});
-				*/
 		});
 
 		return this;
