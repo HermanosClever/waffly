@@ -3,7 +3,7 @@
 	$.fn.waffly = function( options ){
 
 		// let's establish our default options
-		var $dots, $dot, obj, rvalue, gvalue, def_bg, opacity_style, dot_styles, dot_width, settings = $.extend({
+		var $dots, obj, animation, rvalue, gvalue, def_bg, opacity_style, dot_styles, dot_width, settings = $.extend({
 			class_name: 'waffly',
 			style_override: false,
 			default_color: '',
@@ -11,7 +11,6 @@
 			graph_title_color: '#666',
 			graph_value_color: '#05c',
 			graph_color: '#05c',
-			graph_value:'80%',
 			graph_margin: '30px',
 			graph_class:'sel',
 			total_dots: 100,
@@ -27,19 +26,64 @@
 
 		this.each(function() {
 
-				if ( $(this).data('waffly-value') ){
-					settings.graph_value = $(this).data('waffly-value').replace(',','.');
-				} else {
-					settings.graph_value = settings.graph_value.replace(',','.');
+			/**
+			 * Dot is used as decimal mark
+			 */
+			if ( $(this).data('waffly-value') ){
+
+				settings.graph_value = $(this).data('waffly-value').replace(',','.');
+
+			} else {
+
+				settings.graph_value = settings.graph_value.replace(',','.');
+
+			}
+
+			/**
+			 * The percent value is rounded if necessary to keep the number of digits to appear after the decimal point lower than 3 digits
+			 */
+			if ( settings.graph_value.indexOf('.') > -1 ){
+				gvalue = settings.graph_value.split('.');
+
+				if ( gvalue[1].length > 3 ){
+					settings.graph_value = parseFloat(settings.graph_value).toFixed(2) + '%';
 				}
+			}
 
-				if ( settings.graph_value.indexOf('.') > -1 ){
-					gvalue = settings.graph_value.split('.');
 
-					if ( gvalue[1].length > 3 ){
-						settings.graph_value = parseFloat(settings.graph_value).toFixed(2) + '%';
+			if ( settings.style_override ){
+
+				obj = '<div class="' + settings.class_name + '">';
+
+
+				obj += '<div class="waffly_value" >' + settings.graph_value + '</div>';
+
+				obj += '<ul class="waffly_dots">';
+
+
+				for (var i = 0; i < settings.total_dots; i++) {
+
+					if ( i < parseInt(settings.graph_value) ) {
+							obj += '<li class="waffly_dot d' + (i+1) + ' ' + 'waffly_sel' + '"></li>';
+
+
+					} else {
+						obj += '<li class="waffly_dot d' + (i+1) +'"></li>';
 					}
+
+				};
+
+				obj += '</ul>';
+
+				if ( $(this).data('waffly-title') ){
+
+					obj += '<div class="waffly_title">' + $(this).data('waffly-title') + '</div>';
+
 				}
+
+				obj += '</div>';
+
+			} else {
 
 				obj = '<div class="' + settings.class_name + '" style="-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;font-family:' + settings.graph_font + ';padding:' + settings.graph_margin + ';width:' + settings.graph_width + 'px;" title="' + $(this).text() + '">';
 
@@ -51,23 +95,14 @@
 
 				obj += '<ul class="waffly_dots" style="font-size:0;list-style:none;margin:0;padding:0;">';
 
-				dot_styles = '';
-				dot_styles += 'border-radius:' + settings.dot_radius + ';';
-				dot_styles += 'display:inline-block;';
-				dot_styles += 'height:' + dot_width + 'px;';
-				dot_styles += 'margin:0 ' + settings.dot_gap + 'px ' + settings.dot_gap + 'px 0;';
-				dot_styles += 'width:' + dot_width + 'px;';
+				dot_styles = 'border-radius:' + settings.dot_radius + ';display:inline-block;height:' + dot_width + 'px;margin:0 ' + settings.dot_gap + 'px ' + settings.dot_gap + 'px 0;width:' + dot_width + 'px;';
 
 				opacity_styles ='';
 				if ( settings.default_color === '' ){
 
 					def_bg = settings.graph_color;
 
-					opacity_styles += "-ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=" + ( settings.dot_opacity * 100 ) + ")';";
-					opacity_styles += 'filter: alpha(opacity=' + ( settings.dot_opacity * 100 ) + ');';
-					opacity_styles += '-moz-opacity: ' + settings.dot_opacity + ';';
-					opacity_styles += '-khtml-opacity: ' + settings.dot_opacity + ';';
-					opacity_styles += 'opacity:' + settings.dot_opacity + ';';
+					opacity_styles += "-ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=" + ( settings.dot_opacity * 100 ) + ")';" + 'filter: alpha(opacity=' + ( settings.dot_opacity * 100 ) + ');-moz-opacity: ' + settings.dot_opacity + ';-khtml-opacity: ' + settings.dot_opacity + ';opacity:' + settings.dot_opacity + ';';
 
 				} else{
 
@@ -94,29 +129,61 @@
 				obj += '</ul>';
 
 				if ( $(this).data('waffly-title') ){
+
 					obj += '<div class="waffly_title" style="color:' + settings.graph_title_color + ';margin-top:.75em;text-align:center">' + $(this).data('waffly-title') + '</div>';
+
 				}
 
 				obj += '</div>';
 
-				$(this).html( obj );
+			}
 
-				if (settings.graph_reverse){
+			$(this).html( obj );
+
+			if (settings.graph_reverse){
+
 					$(this).find('.waffly_dots').append( $(this).find('.waffly_dot').get().reverse() );
-				}
 
-				// animacion
+			}
 
-				$dots = $(this).find('.waffly_dot.sel');
+			/**
+			 * Animation
+			 */
 
-				if (settings.graph_animate){
+			if (settings.graph_animate){
+
+				if ( settings.style_override ){
+					$dots = $(this).find('.waffly_dot.waffly_sel');
+					if (settings.graph_reverse){
+
+						$dots.each(function(index,el) {
+
+							setTimeout(function(){
+								$dots.eq( Math.abs(index - $dots.length + 1 ) ).addClass('sel');
+							},500 + (index*20));
+
+						});
+
+					} else {
+
+						$dots.each(function(index,el) {
+
+							setTimeout(function(){
+								$(el).addClass('sel');
+							},500 + (index*20));
+
+						});
+
+					}
+
+				} else {
+
+					$dots = $(this).find('.waffly_dot.sel');
 
 					if (settings.graph_reverse){
 
-// resta 61 y coges el puto valor absoluto! Gañán!
 
-
-						$(this).find('.waffly_dot.sel').each(function(index,el) {
+						$dots.each(function(index,el) {
 							var $dot = $dots.eq( Math.abs(index - $dots.length + 1 ) );
 
 							setTimeout(function(){
@@ -127,7 +194,7 @@
 
 					} else {
 
-						$(this).find('.waffly_dot.sel').each(function(index,el) {
+						$dots.each(function(index,el) {
 
 							setTimeout(function(){
 								$(el).animate({'opacity': 1}, 10);
@@ -138,6 +205,10 @@
 					}
 
 				}
+
+			}
+
+
 
 		});
 

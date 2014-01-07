@@ -3,12 +3,51 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Waffly demo</title>
+	<style>
+	.my_chart{
+		border:1px solid #ccc;
+		font:1em 'comic sans ms', serif;
+		width:400px;
+		}
+	.my_chart .waffly{
+		padding:2em;
+		}
+	.my_chart .waffly_dots{
+		list-style:none;
+		margin:0;
+		padding:0;
+		}
+	.my_chart .waffly_dot{
+		display:inline-block;
+		background:url(imgs/casas.png) right top no-repeat;
+		height:16px;
+		margin-right:6px;
+		width:16px;
+		}
+	.my_chart .waffly_dot.sel{background-position:left top;}
+	.my_chart .waffly_value{
+		color:#F46508;
+		font-size:2em;
+		margin-bottom:.5em;
+		text-align:center;
+		}
+	.my_chart .waffly_title{
+		margin-top:1em;
+		text-align:center;
+		}
+
+	</style>
 </head>
 <body>
 
-	<div class="chart" data-waffly-title="Waffly (Jquery plugin)" data-waffly-value="99.7%">
+	<div class="chart" data-waffly-title="Waffly (Jquery plugin)" data-waffly-value="99,5%">
 		<div class="title">Waffly (Jquery plugin)</div>
-		<meter class="chart" value="57.142857143" optimun="70" max="100"></meter>
+		<meter class="chart" value="99.5" max="100"></meter>
+	</div>
+
+	<div class="my_chart" data-waffly-title="Casas habitadas" data-waffly-value="16,129%">
+		<div class="title">Casas habitadas</div>
+		<meter class="chart" value="16.129" max="62"></meter>
 	</div>
 
 
@@ -26,7 +65,14 @@
 			graph_value_color:'#f90',
 			dot_opacity:.2,
 			graph_reverse:true,
-			graph_animate:true
+			graph_animate:true,
+		});
+
+		$('.my_chart').waffly({
+			graph_reverse:false,
+			graph_animate:true,
+			style_override:true,
+			total_dots: 62,
 		});
 	});
 	</script>
